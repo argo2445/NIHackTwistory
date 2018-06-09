@@ -1,0 +1,3 @@
+[submodule "watson_python-sdk"]
+	path = watson_python-sdk
+	url = git@github.com:watson-developer-cloud/python-sdk.git
