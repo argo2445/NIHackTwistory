@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `tweets` (
   `user_id` bigint(20) unsigned NOT NULL,
   `tweet_text` varchar(400) NOT NULL,
   `name` varchar(20) DEFAULT NULL,
-  `created_at` datetime NOT NULL,
+  `created_at` varchar(40) DEFAULT NULL,
   `geo_lat` decimal(10,5) DEFAULT NULL,
   `geo_long` decimal(10,5) DEFAULT NULL,
   `screen_name` char(20) NOT NULL,
