@@ -46,7 +46,6 @@ var svg;
 var path;
 var zoom;
 
-var emotion = "anger";
 
 function refresh() {
   $.ajax({
@@ -83,6 +82,7 @@ function color(col){
 
 function displayData(data){
   console.log(data);
+  var emotion = $("#emo").val();
   stateIDToAvgEmotion = {};
   data.tweets.forEach(function(tweet){
     geojs.features.forEach(function(dat){
@@ -93,6 +93,9 @@ function displayData(data){
       if(dat.properties.NAME === tweet.name){
         if(typeof stateIDToAvgEmotion[dat.properties.NAME] === 'undefined')
           stateIDToAvgEmotion[dat.properties.NAME] = {sum: 0, num: 0};
+        console.log(tweet[emotion]);
+        console.log(emotion);
+        console.log(tweet);
         stateIDToAvgEmotion[dat.properties.NAME].sum += tweet[emotion];
         stateIDToAvgEmotion[dat.properties.NAME].num += 1;
       }
@@ -105,12 +108,6 @@ function displayData(data){
     .enter().append("path")
       .attr("d", path)
       .attr("class", "pth")
-      .attr("title", function(d) { 
-        if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
-          return d.properties.NAME + " " +(stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num);
-        else
-          return d.properties.NAME + " " +(0.0);
-      })
       .attr("fill", function(d) { 
         if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
           return color(stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num);
@@ -123,7 +120,12 @@ function displayData(data){
         .enter()
         .append("text")
           .attr("class", "label")
-          .text(function(d) { return d.properties.NAME;})
+          .text(function(d) { 
+            if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
+              return d.properties.NAME + " " + (stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num).toFixed(2);
+            else
+              return d.properties.NAME + " 0.0";
+          })
           .attr("transform", function(d) { 
             var centr = path.centroid(d);
             centr[0]-=this.getComputedTextLength()/2;
