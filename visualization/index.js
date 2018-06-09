@@ -124,7 +124,6 @@ app.post("/getData", function(req, res){
             reject(err);
         }
     }).then(function(result) {
-        console.log(result)
         var ans = {
             tweets: []
         };

@@ -93,9 +93,6 @@ function displayData(data){
       if(dat.properties.NAME === tweet.name){
         if(typeof stateIDToAvgEmotion[dat.properties.NAME] === 'undefined')
           stateIDToAvgEmotion[dat.properties.NAME] = {sum: 0, num: 0};
-        console.log(tweet[emotion]);
-        console.log(emotion);
-        console.log(tweet);
         stateIDToAvgEmotion[dat.properties.NAME].sum += tweet[emotion];
         stateIDToAvgEmotion[dat.properties.NAME].num += 1;
       }
