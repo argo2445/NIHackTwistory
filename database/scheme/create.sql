@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `json_cache` (
   `tweet_id` bigint(20) unsigned NOT NULL,
   `cache_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `cache_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `raw_tweet` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `raw_tweet` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`cache_id`),
   KEY `tweet_id` (`tweet_id`),
   KEY `cache_date` (`cache_date`)
