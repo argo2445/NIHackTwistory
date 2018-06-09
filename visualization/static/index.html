@@ -4,8 +4,20 @@
 <head>
 <meta charset="utf-8">
 <style>
-svg {
-  display:block;
+button {
+  position: fixed;
+  top: 5px;
+  left: 5px;
+}
+
+select {
+  position: fixed;
+  top: 30px;
+  left: 5px;
+}
+body {
+  margin: 0;
+  padding: 0;
 }
 text {
   font-size: 7pt;
@@ -19,8 +31,8 @@ text {
 <script src="topojson.v2.min.js"></script>
 <script src="jquery-3.3.1.min.js"></script>
 <script>
-var width = 1800;
-var height = 800;
+var width = window.innerWidth-5;
+var height = window.innerHeight-5;
 var geojs;
 var stateIDToAvgEmotion = {};
 var svg;
@@ -137,13 +149,15 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
-  <button type="button" id="refr">Refresh!</button> 
-  <select id="emo">
-    <option value="anger">Anger</option>
-    <option value="joy">Joy</option>
-    <option value="disgust">Disgust</option>
-    <option value="fear">Fear</option>
-    <option value="sadness">Sadness</option>
-  </select> 
+  <div id="menu">
+    <button type="button" id="refr">Refresh!</button> 
+    <select id="emo">
+      <option value="anger">Anger</option>
+      <option value="joy">Joy</option>
+      <option value="disgust">Disgust</option>
+      <option value="fear">Fear</option>
+      <option value="sadness">Sadness</option>
+    </select> 
+  </div>
 </body>
 </html>
