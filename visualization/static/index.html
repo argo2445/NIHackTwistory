@@ -4,11 +4,12 @@
 <head>
 <meta charset="utf-8">
 <style>
-button, svg, select {
+svg {
   display:block;
 }
-
-
+text {
+  font-size: 7pt;
+}
 </style>
 <script src="d3.v3.min.js"></script>
 <script src="d3-geo.v1.min.js"></script>
@@ -18,17 +19,17 @@ button, svg, select {
 <script src="topojson.v2.min.js"></script>
 <script src="jquery-3.3.1.min.js"></script>
 <script>
-var width = 960;
-var height = 500;
+var width = 1800;
+var height = 800;
 var geojs;
 var stateIDToAvgEmotion = {};
 var svg;
 var path;
+var zoom;
 
 var emotion = "anger";
 
 function refresh() {
-  console.log("refr");
   $.ajax({
       url: '/getData',
       data: {
@@ -36,7 +37,6 @@ function refresh() {
       },
       type: 'post',
       success: function(result) {
-        console.log("refr2");
         displayData(result);
       }
   });
@@ -62,25 +62,56 @@ function displayData(data){
     });
   });
   console.log(stateIDToAvgEmotion);
-  svg.selectAll("path").remove();
+  svg.selectAll("*").remove();
   svg.selectAll("path")
       .data(geojs.features)
     .enter().append("path")
       .attr("d", path)
+      .attr("class", "pth")
+      .attr("title", function(d) { 
+        if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
+          return d.properties.NAME + " " +(stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num);
+        else
+          return d.properties.NAME + " " +(0.0);
+      })
       .attr("fill", function(d) { 
         if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
           return d3.interpolateReds(stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num);
         else
           return d3.interpolateReds(0.0);
-      });
+      })
+      .attr("stroke", "#000000");
+    svg.selectAll("text")
+        .data(geojs.features)
+        .enter()
+        .append("text")
+          .attr("class", "label")
+          .text(function(d) { return d.properties.NAME;})
+          .attr("transform", function(d) { 
+            var centr = path.centroid(d);
+            centr[0]-=this.getComputedTextLength()/2;
+            return "translate(" + centr + ")"; 
+          });
+}
+
+function zoomhandler() {
+  svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 }
 
 $(document).ready(function(){
   path = d3.geo.path();
 
-  svg = d3.select("body").append("svg")
-      .attr("width", width)
-      .attr("height", height);
+  zoom = d3.behavior.zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", zoomhandler);
+
+  svg = d3.select("body")
+      .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+      .append("g")
+        .attr("id","zoomgroup")
+        .call(zoom);
 
   var url = "gz_2010_us_040_00_20m.json";
   d3.json(url, function(error, topology) {
@@ -90,13 +121,12 @@ $(document).ready(function(){
     
     console.log("geojson", geojs);
 
-    svg.selectAll("path")
-        .data(geojs.features)
-      .enter().append("path")
-        .attr("d", path)
-        .attr("fill", function(d) { return d3.interpolateReds(0.5); });
-    
+    refresh();    
   });
+
+  var zoom = d3.behavior.zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", zoomhandler);
 
   $("#refr").click(function(){
     refresh();

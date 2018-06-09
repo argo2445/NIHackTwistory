@@ -51,6 +51,9 @@ app.post("/getData", function(req, res){
             ]
         });
     }
+    else{
+        res.send({tweets: []});
+    }
 });
 
 app.listen(8080);
