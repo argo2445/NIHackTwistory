@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `json_cache` (
   PRIMARY KEY (`cache_id`),
   KEY `tweet_id` (`tweet_id`),
   KEY `cache_date` (`cache_date`)
-) ENGINE = InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `tweets` (
   `tweet_id` bigint(20) unsigned NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `tweets` (
   KEY `screen_name` (`screen_name`),
   KEY `name` (`name`),
   FULLTEXT KEY `tweet_text` (`tweet_text`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `tweet_mentions` (
   `tweet_id` bigint(20) unsigned NOT NULL,
@@ -41,21 +41,21 @@ CREATE TABLE IF NOT EXISTS `tweet_mentions` (
   KEY `tweet_id` (`tweet_id`),
   KEY `source` (`source_user_id`),
   KEY `target` (`target_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `tweet_tags` (
   `tweet_id` bigint(20) unsigned NOT NULL,
   `tag` varchar(100) NOT NULL,
   KEY `tweet_id` (`tweet_id`),
   KEY `tag` (`tag`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `tweet_urls` (
   `tweet_id` bigint(20) unsigned NOT NULL,
   `url` varchar(140) NOT NULL,
   KEY `tweet_id` (`tweet_id`),
   KEY `url` (`url`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `users` (
   `user_id` bigint(20) unsigned NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `last_update` (`last_update`),
   KEY `screen_name` (`screen_name`),
   FULLTEXT KEY `description` (`description`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `entities` (
     `entity_id` bigint(20) unsigned NOT NULL,
@@ -85,25 +85,25 @@ CREATE TABLE IF NOT EXISTS `entities` (
     `entity_type_id` bigint(20) unsigned NOT NULL,
     PRIMARY KEY (`entity_id`)
 
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `e_types` (
 `e_type_id` bigint(20) unsigned NOT NULL,
 `text` varchar(100) NOT NULL, 
  PRIMARY KEY (`e_type_id`)  
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `e_subtypes` (
 `e_subtype_id` bigint(20) unsigned NOT NULL,
 `text` varchar(100) NOT NULL,  
   PRIMARY KEY (`e_subtype_id`)  
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `entity_subtypes` (
   `entity_id` bigint(20) unsigned NOT NULL,
   `e_subtype_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`entity_id`,`e_subtype_id`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `tweet_entities` (
 `tweet_id` bigint(20) unsigned NOT NULL,
@@ -113,4 +113,4 @@ CREATE TABLE IF NOT EXISTS `tweet_entities` (
 PRIMARY KEY (`tweet_id`,`entity_id`),
 KEY `entity_id` (`entity_id`),
 KEY `tweet_id` (`tweet_id`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
