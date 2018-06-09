@@ -3,19 +3,13 @@
 
 <head>
 <meta charset="utf-8">
-<!--<style>
-
-path {
-  fill: #ccc;
-  stroke: #fff;
-  stroke-width: .5px;
+<style>
+button, svg, select {
+  display:block;
 }
 
-path:hover {
-  fill: red;
-}
 
-</style>-->
+</style>
 <script src="d3.v3.min.js"></script>
 <script src="d3-geo.v1.min.js"></script>
 <script src="d3-color.v1.min.js"></script>
@@ -24,17 +18,26 @@ path:hover {
 <script src="topojson.v2.min.js"></script>
 <script src="jquery-3.3.1.min.js"></script>
 <script>
-
+var width = 960;
+var height = 500;
 var geojs;
 var stateIDToAvgEmotion = {};
+var svg;
+var path;
+
+var emotion = "anger";
 
 function refresh() {
+  console.log("refr");
   $.ajax({
       url: '/getData',
-      data: {},
+      data: {
+        emotion: $("#emo").val()
+      },
       type: 'post',
       success: function(result) {
-          displayData(result);
+        console.log("refr2");
+        displayData(result);
       }
   });
 
@@ -42,31 +45,40 @@ function refresh() {
 
 
 function displayData(data){
+  console.log(data);
+  stateIDToAvgEmotion = {};
   data.tweets.forEach(function(tweet){
     geojs.features.forEach(function(dat){
-      if(d3.geoContains(dat, [tweet.longitude, tweet.latitude])){
+      /*if(d3.geoContains(dat, [tweet.longitude, tweet.latitude])){
         stateIDToAvgEmotion[dat.properties.GEO_ID].sum += tweet.anger;
         stateIDToAvgEmotion[dat.properties.GEO_ID].num += 1;
+      }*/
+      if(dat.properties.NAME === tweet.name){
+        if(typeof stateIDToAvgEmotion[dat.properties.NAME] === 'undefined')
+          stateIDToAvgEmotion[dat.properties.NAME] = {sum: 0, num: 0};
+        stateIDToAvgEmotion[dat.properties.NAME].sum += tweet[emotion];
+        stateIDToAvgEmotion[dat.properties.NAME].num += 1;
       }
     });
   });
-  stateIDToAvgEmotion.forEach(function(state){
-    svg.selectAll("path")
-        .remove()
-        .data(geojs.features)
-      .enter().append("path")
-        .attr("d", path)
-        .attr("fill", function(d) { return d3.interpolateReds(state.sum/state.num); });
-  });
+  console.log(stateIDToAvgEmotion);
+  svg.selectAll("path").remove();
+  svg.selectAll("path")
+      .data(geojs.features)
+    .enter().append("path")
+      .attr("d", path)
+      .attr("fill", function(d) { 
+        if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
+          return d3.interpolateReds(stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num);
+        else
+          return d3.interpolateReds(0.0);
+      });
 }
 
 $(document).ready(function(){
-  var width = 960;
-  var height = 500;
+  path = d3.geo.path();
 
-  var path = d3.geo.path();
-
-  var svg = d3.select("body").append("svg")
+  svg = d3.select("body").append("svg")
       .attr("width", width)
       .attr("height", height);
 
@@ -85,11 +97,23 @@ $(document).ready(function(){
         .attr("fill", function(d) { return d3.interpolateReds(0.5); });
     
   });
+
+  $("#refr").click(function(){
+    refresh();
+  });
 });
 
 
 </script>
 </head>
 <body>
+  <button type="button" id="refr">Refresh!</button> 
+  <select id="emo">
+    <option value="anger">Anger</option>
+    <option value="joy">Joy</option>
+    <option value="disgust">Disgust</option>
+    <option value="fear">Fear</option>
+    <option value="sadness">Sadness</option>
+  </select> 
 </body>
 </html>
