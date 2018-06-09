@@ -6,4 +6,7 @@ var mysql = require('mysql');
 var app = express();
 
 app.use(serveStatic(path.join(__dirname, 'static')));
+
+//app.post
+
 app.listen(8080);
