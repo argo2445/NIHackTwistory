@@ -3,19 +3,33 @@
 
 <head>
 <meta charset="utf-8">
-<!--<style>
-
-path {
-  fill: #ccc;
-  stroke: #fff;
-  stroke-width: .5px;
+<style>
+button {
+  position: fixed;
+  top: 5px;
+  left: 5px;
 }
 
-path:hover {
-  fill: red;
+#emo {
+  position: fixed;
+  top: 35px;
+  left: 5px;
 }
 
-</style>-->
+#ht {
+  position: fixed;
+  top: 65px;
+  left: 5px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+text {
+  font-size: 4pt;
+}
+</style>
 <script src="d3.v3.min.js"></script>
 <script src="d3-geo.v1.min.js"></script>
 <script src="d3-color.v1.min.js"></script>
@@ -24,51 +38,116 @@ path:hover {
 <script src="topojson.v2.min.js"></script>
 <script src="jquery-3.3.1.min.js"></script>
 <script>
-
+var width = window.innerWidth-5;
+var height = window.innerHeight-5;
 var geojs;
 var stateIDToAvgEmotion = {};
+var svg;
+var path;
+var zoom;
+
 
 function refresh() {
   $.ajax({
       url: '/getData',
-      data: {},
+      data: {
+        emotion: $("#emo").val(),
+        ht: $("#ht").val()
+      },
       type: 'post',
       success: function(result) {
-          displayData(result);
+        displayData(result);
       }
   });
 
+}
+
+function color(col){
+  var em = $("#emo").val();
+  switch(em){
+    case "anger":
+      return d3.interpolateReds(col);
+    case "sadness":
+      return d3.interpolateBlues(col);
+    case "disgust":
+      return d3.interpolateGreens(col);
+    case "fear":
+      return d3.interpolatePuRd(col);
+    case "sadness":
+    default:
+      return d3.interpolateYlOrBr(col);
+  }
 }
 
 
 function displayData(data){
+  console.log(data);
+  var emotion = $("#emo").val();
+  stateIDToAvgEmotion = {};
   data.tweets.forEach(function(tweet){
     geojs.features.forEach(function(dat){
-      if(d3.geoContains(dat, [tweet.longitude, tweet.latitude])){
+      /*if(d3.geoContains(dat, [tweet.longitude, tweet.latitude])){
         stateIDToAvgEmotion[dat.properties.GEO_ID].sum += tweet.anger;
         stateIDToAvgEmotion[dat.properties.GEO_ID].num += 1;
+      }*/
+      if(dat.properties.NAME === tweet.name){
+        if(typeof stateIDToAvgEmotion[dat.properties.NAME] === 'undefined')
+          stateIDToAvgEmotion[dat.properties.NAME] = {sum: 0, num: 0};
+        stateIDToAvgEmotion[dat.properties.NAME].sum += tweet[emotion];
+        stateIDToAvgEmotion[dat.properties.NAME].num += 1;
       }
     });
   });
-  stateIDToAvgEmotion.forEach(function(state){
-    svg.selectAll("path")
-        .remove()
+  console.log(stateIDToAvgEmotion);
+  svg.selectAll("*").remove();
+  svg.selectAll("path")
+      .data(geojs.features)
+    .enter().append("path")
+      .attr("d", path)
+      .attr("class", "pth")
+      .attr("fill", function(d) { 
+        if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
+          return color(stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num);
+        else
+          return color(0.0);
+      })
+      .attr("stroke", "#000000");
+    svg.selectAll("text")
         .data(geojs.features)
-      .enter().append("path")
-        .attr("d", path)
-        .attr("fill", function(d) { return d3.interpolateReds(state.sum/state.num); });
-  });
+        .enter()
+        .append("text")
+          .attr("class", "label")
+          .text(function(d) { 
+            if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
+              return d.properties.NAME + " " + (stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num).toFixed(2)+" ("+stateIDToAvgEmotion[d.properties.NAME].num+")";
+            else
+              return d.properties.NAME + " 0.0 (0)";
+          })
+          .attr("transform", function(d) { 
+            var centr = path.centroid(d);
+            centr[0]-=this.getComputedTextLength()/2;
+            return "translate(" + centr + ")"; 
+          });
+}
+
+function zoomhandler() {
+  svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 }
 
 $(document).ready(function(){
-  var width = 960;
-  var height = 500;
+  path = d3.geo.path();
 
-  var path = d3.geo.path();
+  zoom = d3.behavior.zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", zoomhandler);
 
-  var svg = d3.select("body").append("svg")
-      .attr("width", width)
-      .attr("height", height);
+  svg = d3.select("body")
+      .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+      .append("g")
+        .attr("id","zoomgroup")
+        .call(zoom);
 
   var url = "gz_2010_us_040_00_20m.json";
   d3.json(url, function(error, topology) {
@@ -78,12 +157,15 @@ $(document).ready(function(){
     
     console.log("geojson", geojs);
 
-    svg.selectAll("path")
-        .data(geojs.features)
-      .enter().append("path")
-        .attr("d", path)
-        .attr("fill", function(d) { return d3.interpolateReds(0.5); });
-    
+    refresh();    
+  });
+
+  var zoom = d3.behavior.zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", zoomhandler);
+
+  $("#refr").click(function(){
+    refresh();
   });
 });
 
@@ -91,5 +173,22 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
+  <div id="menu">
+    <button type="button" id="refr">Refresh!</button> 
+    <select id="emo">
+      <option value="anger">Anger</option>
+      <option value="joy">Joy</option>
+      <option value="disgust">Disgust</option>
+      <option value="fear">Fear</option>
+      <option value="sadness">Sadness</option>
+    </select> 
+    <select id="ht">
+      <option value="g7">g7</option>
+      <option value="g7summit">g7summit</option>
+      <option value="G7Charlevoix">G7Charlevoix</option>
+      <option value="g8">g8</option>
+      <option value="trump">trump</option>
+    </select> 
+  </div>
 </body>
 </html>
