@@ -27,7 +27,7 @@ var config = {
 var poolCluster = mysql.createPool(config);
 
 app.post("/getData", function(req, res){
-    console.log("Hallo", req.body.emotion);
+    console.log("Hallo", req.body.emotion, req.body.ht);
     /*var prom = new Promise(function(resolve, reject) {
 
     }).then(function(result) {

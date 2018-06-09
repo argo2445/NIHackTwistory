@@ -10,11 +10,18 @@ button {
   left: 5px;
 }
 
-select {
+#emo {
   position: fixed;
   top: 35px;
   left: 5px;
 }
+
+#ht {
+  position: fixed;
+  top: 65px;
+  left: 5px;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -45,7 +52,8 @@ function refresh() {
   $.ajax({
       url: '/getData',
       data: {
-        emotion: $("#emo").val()
+        emotion: $("#emo").val(),
+        ht: $("#ht").val()
       },
       type: 'post',
       success: function(result) {
@@ -53,6 +61,23 @@ function refresh() {
       }
   });
 
+}
+
+function color(col){
+  var em = $("#emo").val();
+  switch(em){
+    case "anger":
+      return d3.interpolateReds(col);
+    case "sadness":
+      return d3.interpolateBlues(col);
+    case "disgust":
+      return d3.interpolateGreens(col);
+    case "fear":
+      return d3.interpolatePuRd(col);
+    case "sadness":
+    default:
+      return d3.interpolateYlOrBr(col);
+  }
 }
 
 
@@ -88,9 +113,9 @@ function displayData(data){
       })
       .attr("fill", function(d) { 
         if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
-          return d3.interpolateReds(stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num);
+          return color(stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num);
         else
-          return d3.interpolateReds(0.0);
+          return color(0.0);
       })
       .attr("stroke", "#000000");
     svg.selectAll("text")
@@ -157,6 +182,10 @@ $(document).ready(function(){
       <option value="disgust">Disgust</option>
       <option value="fear">Fear</option>
       <option value="sadness">Sadness</option>
+    </select> 
+    <select id="ht">
+      <option value="bla">bla</option>
+      <option value="trump">trump</option>
     </select> 
   </div>
 </body>
