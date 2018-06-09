@@ -13,8 +13,31 @@ app.use(bodyParser.json());
 
 app.use(serveStatic(path.join(__dirname, 'static')));
 
+var config = {
+    host: '',
+    port: 3306,
+    user: '',
+    password: '',
+    database: '',
+    connectionLimit: 15,
+    queueLimit: 30,
+    acquireTimeout: 2147483647
+}
+
+var poolCluster = mysql.createPool(config);
+
 app.post("/getData", function(req, res){
-    console.log("Hallo", req.body.emotion);
+    console.log("Hallo", req.body.emotion, req.body.ht);
+    /*var prom = new Promise(function(resolve, reject) {
+
+    }).then(function(result) {
+        res.send(result); //send result to client
+    }, function(err) {
+        console.log(err);
+        res.send({
+            "tweets": []
+        });
+    });*/
     if(req.body.emotion === "anger"){
         res.send({
             tweets: [
