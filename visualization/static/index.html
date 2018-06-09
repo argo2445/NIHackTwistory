@@ -90,6 +90,14 @@ function ready(error, us) {
       .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
       .attr("class", "states")
       .attr("d", path);
+
+  console.log(topojson.feature(us, us.objects.states));
+  var wyom = [42.893854, -107.596008];
+  topojson.feature(us, us.objects.states).features.forEach(function(dat){
+    if(d3.geoContains(dat, wyom))
+      console.log(dat);
+  });
+  
 }
 
 </script>
