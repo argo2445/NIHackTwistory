@@ -1,0 +1,5 @@
+Pro Tweet: ~6 KB
+Schätzung: 1000 Tweets / Minute
+Laufzeit: 12 h
+
+Speicherplatzbedarf: 4320 MB
