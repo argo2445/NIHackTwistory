@@ -27,7 +27,7 @@ body {
   padding: 0;
 }
 text {
-  font-size: 7pt;
+  font-size: 4pt;
 }
 </style>
 <script src="d3.v3.min.js"></script>
@@ -119,9 +119,9 @@ function displayData(data){
           .attr("class", "label")
           .text(function(d) { 
             if(typeof stateIDToAvgEmotion[d.properties.NAME] !== 'undefined')
-              return d.properties.NAME + " " + (stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num).toFixed(2);
+              return d.properties.NAME + " " + (stateIDToAvgEmotion[d.properties.NAME].sum/stateIDToAvgEmotion[d.properties.NAME].num).toFixed(2)+" ("+stateIDToAvgEmotion[d.properties.NAME].num+")";
             else
-              return d.properties.NAME + " 0.0";
+              return d.properties.NAME + " 0.0 (0)";
           })
           .attr("transform", function(d) { 
             var centr = path.centroid(d);
